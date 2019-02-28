@@ -7,5 +7,7 @@ public class Main {
 
         BeanFactory beanFactory = new BeanFactory();
         beanFactory.instantiate("main.java.si.inspirited");
+        beanFactory.populateProperties();
+
     }
 }

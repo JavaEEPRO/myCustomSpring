@@ -1,8 +1,12 @@
 package org.springframework.beans.factory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.stereotype.Component;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -44,5 +48,26 @@ public class BeanFactory {
             }
         }catch (Exception e) {e.printStackTrace();}
         System.out.println(singletons);
+    }
+
+    public void populateProperties(){
+        System.out.println("========> <--populateProperties--> <========");
+
+        for (Object object : singletons.values()) {
+            for (Field field : object.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Autowired.class)) {
+                    for (Object dependency : singletons.values()) {
+                        if (dependency.getClass().equals(field.getType())) {
+                            String setterName = "set" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1);//setPromotionsService
+                            System.out.println("Setter name = " + setterName);
+                            try {
+                                Method setter = object.getClass().getMethod(setterName, dependency.getClass());
+                                setter.invoke(object, dependency);
+                            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) { e.printStackTrace(); }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
