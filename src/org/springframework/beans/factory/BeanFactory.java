@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -46,7 +48,7 @@ public class BeanFactory {
                     }
                 }
             }
-        }catch (Exception e) {e.printStackTrace();}
+        }catch (NoSuchMethodException | ClassNotFoundException | IOException | InstantiationException | IllegalAccessException | InvocationTargetException | URISyntaxException e) {e.printStackTrace();}
         System.out.println(singletons);
     }
 
@@ -67,6 +69,15 @@ public class BeanFactory {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    public void injectBeanNames(){
+        for (String name : singletons.keySet()) {
+            Object bean = singletons.get(name);
+            if(bean instanceof BeanNameAware){
+                ((BeanNameAware) bean).setBeanName(name);
             }
         }
     }
